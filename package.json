@@ -1,0 +1,14 @@
+{
+  "name": "agent-video",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Agent Video — launcher root untuk Railway: menjalankan server/ dan menyajikan webapp/ (Telegram Mini App).",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "grammy": "^1.30.0"
+  }
+}
