@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Agent Video</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header class="header">
+    <div class="user-card">
+      <img id="user-photo" class="avatar" src="" alt="" style="display:none">
+      <div id="user-photo-fallback" class="avatar avatar-fallback">🎬</div>
+      <div class="user-info">
+        <div id="user-name" class="user-name">Tamu</div>
+        <div id="user-sub" class="user-sub">Mode Demo — buka lewat Telegram untuk login</div>
+      </div>
+      <span id="mode-badge" class="badge">DEMO</span>
+    </div>
+    <h1 class="app-title">🎬 Agent Video</h1>
+    <p class="app-tagline">AI bikin video, siap upload ke sosmed kamu</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-view="home">🏠 Beranda</button>
+    <button class="tab" data-view="history">🕘 Riwayat</button>
+    <button class="tab" data-view="social">🔗 Sosmed</button>
+    <button class="tab" data-view="settings">⚙️ Settings</button>
+  </nav>
+
+  <!-- ============ BERANDA ============ -->
+  <section id="view-home" class="view active">
+    <h2 class="section-title">Mau bikin video apa hari ini?</h2>
+    <div class="mode-grid">
+      <button class="mode-card" data-mode="popular">
+        <span class="mode-emoji">🔥</span>
+        <span class="mode-name">Popular Video</span>
+        <span class="mode-desc">AI bikin video dari yang lagi populer pekan ini</span>
+      </button>
+      <button class="mode-card" data-mode="funny">
+        <span class="mode-emoji">😂</span>
+        <span class="mode-name">Funny Video</span>
+        <span class="mode-desc">AI bikin video lucu yang bikin ngakak</span>
+      </button>
+      <button class="mode-card" data-mode="film">
+        <span class="mode-emoji">🎞️</span>
+        <span class="mode-name">Film Video</span>
+        <span class="mode-desc">AI bikin video film — bisa lanjutkan cerita</span>
+      </button>
+    </div>
+    <div class="hint-box">
+      💡 <b>Popular Video</b> mengambil inspirasi dari tren video populer pekan ini,
+      jadi hasilnya selalu kekinian.
+    </div>
+  </section>
+
+  <!-- ============ FORM GENERATE ============ -->
+  <section id="view-generate" class="view">
+    <button class="back-btn" id="back-home">← Kembali</button>
+    <h2 class="section-title" id="gen-title">Buat Video</h2>
+
+    <!-- Khusus Film: pilih New Film / Lanjutkan Cerita -->
+    <div id="film-choice" class="film-choice" style="display:none">
+      <button class="choice-btn active" data-film-kind="new">🎬 New Film — film baru</button>
+      <button class="choice-btn" data-film-kind="continue">⏭️ Lanjutkan Cerita — dari film sebelumnya</button>
+      <div id="film-list" class="film-list" style="display:none">
+        <p class="label">Pilih film yang mau dilanjutkan:</p>
+        <div id="film-list-items"></div>
+        <p id="film-list-empty" class="empty-note" style="display:none">Belum ada film sebelumnya. Bikin film baru dulu ya.</p>
+      </div>
+    </div>
+
+    <label class="label" for="prompt">Tema / Prompt</label>
+    <textarea id="prompt" rows="3" placeholder="Contoh: kucing oren jadi detektif di pasar malam..."></textarea>
+    <button id="btn-assist" class="secondary-btn" style="margin-top:10px">✨ Bantu Tulis Naskah AI</button>
+    <div id="assist-source" class="job-note" style="margin-top:6px"></div>
+    <div id="trend-box" class="trend-box" style="display:none">
+      <span class="label">🔥 Tren pekan ini (dipakai sebagai inspirasi):</span>
+      <div id="trend-chips" class="chips"></div>
+    </div>
+
+    <label class="label" for="duration">Durasi</label>
+    <select id="duration">
+      <option value="5">5 detik</option>
+      <option value="10" selected>10 detik</option>
+      <option value="15">15 detik</option>
+    </select>
+
+    <label class="label" for="style">Gaya</label>
+    <select id="style">
+      <option value="sinematik">Sinematik</option>
+      <option value="animasi">Animasi</option>
+      <option value="realistis" selected>Realistis</option>
+      <option value="kartun">Kartun</option>
+    </select>
+
+    <button id="btn-generate" class="primary-btn">✨ Generate Video</button>
+  </section>
+
+  <!-- ============ JOB / HASIL ============ -->
+  <section id="view-job" class="view">
+    <h2 class="section-title">Video kamu sedang dibuat</h2>
+    <div class="job-card">
+      <div id="job-status" class="job-status">⏳ Antre...</div>
+      <div class="progress-wrap"><div id="job-progress" class="progress-bar" style="width:0%"></div></div>
+      <div id="job-note" class="job-note">AI sedang menyiapkan adegan...</div>
+      <div id="job-key-source" class="job-note" style="margin-top:4px"></div>
+    </div>
+    <div id="job-result" style="display:none">
+      <video id="result-video" controls playsinline loop></video>
+      <p id="result-title" class="result-title"></p>
+      <div id="download-box" class="download-box">
+        <div id="download-meta" class="job-note"></div>
+        <a id="btn-download" class="download-btn" href="#" download>⬇️ Download Video</a>
+        <div id="download-status" class="job-note" style="margin-top:6px"></div>
+        <button id="btn-open-external" class="secondary-btn" style="display:none;margin-top:8px">🌐 Buka di Browser — bila download tidak jalan di Telegram</button>
+      </div>
+      <div class="upload-row">
+        <span class="label">Upload ke:</span>
+        <button class="upload-btn fb" data-platform="facebook">📘 Facebook</button>
+        <button class="upload-btn yt" data-platform="youtube">▶️ YouTube</button>
+        <button class="upload-btn x" data-platform="x">𝕏 X</button>
+      </div>
+      <button id="btn-again" class="secondary-btn">🔄 Bikin Lagi</button>
+    </div>
+    <button class="back-btn" id="back-home-2">← Beranda</button>
+  </section>
+
+  <!-- ============ RIWAYAT ============ -->
+  <section id="view-history" class="view">
+    <h2 class="section-title">Riwayat Video</h2>
+    <div id="history-list"></div>
+    <p id="history-empty" class="empty-note">Belum ada video. Yuk bikin yang pertama! 🎬</p>
+  </section>
+
+  <!-- ============ SOSMED ============ -->
+  <section id="view-social" class="view">
+    <h2 class="section-title">Hubungkan Sosmed</h2>
+    <p class="section-sub">Video hasil generate bisa langsung di-upload ke akun yang terhubung.</p>
+    <div id="social-list"></div>
+    <div class="hint-box">
+      ℹ️ Menghubungkan akun butuh persetujuan OAuth di tiap platform.
+      Saat ini masih tahap penyiapan — lihat README untuk langkahnya.
+    </div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section id="view-settings" class="view">
+    <h2 class="section-title">⚙️ Settings — API Key Video AI</h2>
+    <p class="section-sub">Tempel API key kamu sendiri per provider. Kalau satu provider mati,
+      tinggal ganti provider aktif — atau nyalakan fallback otomatis.</p>
+    <div id="settings-demo-note" class="hint-box" style="display:none">
+      ⚠️ <b>Mode demo</b> — backend belum terhubung. Pengaturan di sini hanya simulasi:
+      key <b>tidak disimpan</b> dan generate memakai video contoh.
+    </div>
+
+    <label class="label" for="active-provider">Provider aktif</label>
+    <select id="active-provider"></select>
+
+    <label class="switch-row">
+      <input type="checkbox" id="fallback-enabled">
+      <span>Fallback otomatis — bila provider aktif gagal saat generate, coba provider lain yang punya key tersimpan</span>
+    </label>
+
+    <div id="textai-row"></div>
+    <div id="provider-list"></div>
+
+    <div class="hint-box">
+      🔒 Key disimpan <b>terenkripsi (AES-256-GCM)</b> di server, satu key per provider,
+      terikat akun Telegram kamu. Key utuh <b>tidak pernah</b> dikirim balik ke aplikasi,
+      tidak pernah tampil penuh, dan tidak pernah ditulis ke log.
+      Kolom tempel key selalu kosong saat halaman dibuka.
+      <br><br>⚠️ Jangan bagikan API key kamu ke orang lain — key itu terhubung ke
+      tagihan akun AI kamu.
+    </div>
+  </section>
+
+  <div id="toast" class="toast" style="display:none"></div>
+  <footer class="footer">Agent Video • dibuat dengan AI • v0.1 demo</footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
