@@ -1,0 +1,1 @@
+{"dependencies":{"express":"^4.19.2","grammy":"^1.30.0"},"description":"Backend + bot Telegram untuk Agent Video (Telegram Mini App)","main":"index.js","name":"agent-video-server","scripts":{"start":"node index.js"},"version":"0.1.0"}
